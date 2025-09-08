@@ -7,6 +7,7 @@ public class PlayerHealth : MonoBehaviour
 {
     public int health;
     private string enemyTag = "enemy";
+    private string spikeTag = "spike";
     public GameObject[] healthUI;
 
     // Start is called before the first frame update
@@ -38,9 +39,16 @@ public class PlayerHealth : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.CompareTag(enemyTag))
+        if (collision.CompareTag(enemyTag)) TakeDamage();
+        else if (collision.CompareTag(spikeTag))
         {
-            TakeDamage();
-        }
+            // die immediately
+            for (int i = health - 1; i >= 0; i--)
+            {
+                healthUI[i].SetActive(false);
+            }
+            health = 0;
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        } 
     }
 }

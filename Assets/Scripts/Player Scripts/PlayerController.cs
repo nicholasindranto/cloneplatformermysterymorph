@@ -12,8 +12,6 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private bool isFacingRight, isJumping;
     // lagi ditanah kah?
     [SerializeField] private bool isGrounded = false;
-    // reference ke sprite renderer nya
-    private SpriteRenderer sr;
     // reference ke animatornya
     private Animator anim;
     private string walkParam = "isWalking";
@@ -23,7 +21,6 @@ public class PlayerController : MonoBehaviour
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
-        sr = GetComponent<SpriteRenderer>();
         anim = GetComponent<Animator>();
     }
 
@@ -59,12 +56,15 @@ public class PlayerController : MonoBehaviour
         if (direction < 0 && isFacingRight) // kekiri
         {
             isFacingRight = false;
-            sr.flipX = !isFacingRight;
+            // kenapa -180? karna dia menghadap kekiri
+            // kenapa gak flipX di sprite renderer? karna kita punya bullet
+            // kalau cuma flip, maka rotation bulletnya gak akan bener
+            transform.rotation = Quaternion.Euler(0, -180, 0);
         }
         else if (direction > 0 && !isFacingRight) // kekanan
         {
             isFacingRight = true;
-            sr.flipX = !isFacingRight;
+            transform.rotation = Quaternion.Euler(0, 0, 0);
         }
         rb.velocity = new Vector2(direction * moveSpeed, rb.velocity.y);
     }
@@ -104,6 +104,20 @@ public class PlayerController : MonoBehaviour
         if (collision.collider.CompareTag("ground")) // kalau nyentuh tanah
         {
             isGrounded = true; // maka isgrounded
+        }
+        else if (collision.collider.CompareTag("goal"))
+        {
+            if (GoalManager.singleton.canEnter) Debug.Log("Congratulation you win the game");
+            Time.timeScale = 0;
+        }
+    }
+
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.CompareTag("holywater"))
+        {
+            GoalManager.singleton.CollectHolyWater();
+            Destroy(other.gameObject);
         }
     }
 }

@@ -7,6 +7,9 @@ TagManager:
   - ground
   - wall
   - enemy
+  - spike
+  - goal
+  - holywater
   layers:
   - Default
   - TransparentFX
